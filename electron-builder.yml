@@ -1,5 +1,5 @@
 appId: com.guasam.era
-productName: ElectronReactApp
+productName: Cold Blood
 directories:
   buildResources: resources/build
 files:
@@ -12,12 +12,18 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: ElectronReactApp
+  executableName: Cold Blood
+  target:
+    - target: nsis
+      arch:
+        - x64
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  oneClick: false
+  allowToChangeInstallationDirectory: true
 mac:
   entitlementsInherit: resources/build/entitlements.mac.plist
   extendInfo:
@@ -41,3 +47,4 @@ npmRebuild: false
 publish:
   provider: generic
   url: https://example.com/auto-updates
+compression: store

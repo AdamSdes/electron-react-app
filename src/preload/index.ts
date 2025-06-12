@@ -1,12 +1,10 @@
-import { contextBridge, ipcRenderer, shell } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
 const api = {
-  invoke: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...args),
-  openExternal: (url: string) => shell.openExternal(url),
-  minimizeWindow: () => ipcRenderer.invoke('window-minimize'),
-  closeWindow: () => ipcRenderer.invoke('window-close')
+  minimizeWindow: () => ipcRenderer.invoke('minimize-window'),
+  closeWindow: () => ipcRenderer.invoke('close-window')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
@@ -15,7 +13,7 @@ const api = {
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
-    contextBridge.exposeInMainWorld('api', api)
+    contextBridge.exposeInMainWorld('electronAPI', api)
   } catch (error) {
     console.error(error)
   }
@@ -23,5 +21,5 @@ if (process.contextIsolated) {
   // @ts-ignore (define in dts)
   window.electron = electronAPI
   // @ts-ignore (define in dts)
-  window.api = api
+  window.electronAPI = api
 }

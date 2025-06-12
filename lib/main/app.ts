@@ -10,20 +10,36 @@ export function createAppWindow(): void {
 
   // Create the main window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 998,
+    height: 622,
     show: false,
-    backgroundColor: '#1c1c1c',
+    backgroundColor: '#060606',
     icon: appIcon,
     frame: false,
-    titleBarStyle: 'hiddenInset',
+    autoHideMenuBar: false,
     title: 'Electron React App',
     maximizable: false,
     resizable: false,
+    roundedCorners: true,
     webPreferences: {
       preload: join(__dirname, '../preload/preload.js'),
       sandbox: false,
+      devTools: true, // Enable developer tools
+      webSecurity: false, // Disable web security for CORS issues during development
+      allowRunningInsecureContent: true,
+      nodeIntegration: false,
+      contextIsolation: true,
     },
+  })
+
+  // Handle certificate errors for API requests
+  mainWindow.webContents.session.setCertificateVerifyProc((request, callback) => {
+    // Allow the specific API domain to bypass certificate verification
+    if (request.hostname === '195.200.30.205') {
+      callback(0) // 0 means success
+    } else {
+      callback(-2) // Use default verification for other domains
+    }
   })
 
   // Register IPC events for the main window.
@@ -31,11 +47,24 @@ export function createAppWindow(): void {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    // Auto-open DevTools in development
+    if (!app.isPackaged) {
+      mainWindow.webContents.openDevTools()
+      console.log('🔧 Developer tools opened automatically')
+    }
   })
 
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
+  // Add keyboard shortcut for DevTools
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.control && input.shift && input.key.toLowerCase() === 'i') {
+      mainWindow.webContents.toggleDevTools()
+      console.log('🔧 Developer tools toggled via keyboard shortcut')
+    }
+  })
+
+  // Log console messages from renderer
+  mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    console.log(`[Renderer Console ${level}]:`, message)
   })
 
   // HMR for renderer base on electron-vite cli.

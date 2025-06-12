@@ -52,8 +52,15 @@ export default defineConfig({
         '@/app': resolve(__dirname, 'app'),
         '@/lib': resolve(__dirname, 'lib'),
         '@/resources': resolve(__dirname, 'resources'),
+        '@/assets': resolve(__dirname, 'app/assets'),
       },
     },
-    plugins: [tailwindcss(), react()],
+    assetsInclude: ['**/*.svg', '**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif'],
+    plugins: [
+      tailwindcss(), 
+      react({
+        jsxRuntime: 'automatic',
+      })
+    ],
   },
 })
